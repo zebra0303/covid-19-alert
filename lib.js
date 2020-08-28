@@ -9,7 +9,6 @@ exports.getDate = () => {
     mm = '0' + mm;
   }
 
-
   if (dd < 10) {
     dd = '0' + dd;
   }
@@ -18,16 +17,10 @@ exports.getDate = () => {
 };
 
 exports.getAPIURL = (chkDate, apiKey) => {
-  console.log(apiKey);
   const url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson';
-  let queryParams = '?' + encodeURIComponent('ServiceKey') + '=' + apiKey; /* Service Key*/
-  queryParams += '&' + encodeURIComponent('ServiceKey') + '=' + encodeURIComponent('-'); /* */
-  queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /* */
-  queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /* */
-  queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent(chkDate); /* */
-  queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent(chkDate); /* */
+  const params = `?ServiceKey=${apiKey}&ServiceKey=-&pageNo=1&numOfRows=10&startCreateDt=${chkDate}&endCreateDt=${chkDate}`;
 
-  return url + queryParams;
+  return url + params;
 };
 
 exports.extractData = (node, name) => {
@@ -41,7 +34,6 @@ exports.extractData = (node, name) => {
 
   return data;
 };
-
 
 exports.parseCliFlagValue = flagName => {
   const flag = process.argv.find(argument => argument.indexOf(`-${flagName}=`) > -1);

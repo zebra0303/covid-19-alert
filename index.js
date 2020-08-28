@@ -25,7 +25,6 @@ request({
   if (response.statusCode === 200) {
     const parsedData = xml.parse(body);
     for (const node of parsedData[1].childNodes[1].childNodes[0].childNodes) {
-      // TODO : 좀더 고도화 필요
       data = extractData(node, 'Seoul');
       if(Object.keys(data).length > 0) {
         seoul = data;
