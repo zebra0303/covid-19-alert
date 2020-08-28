@@ -42,7 +42,28 @@ request({
     console.log(`* environment: ${environment}\n* msg: ${msg}`);
 
     const headers = { 'Content-type': 'application/json' };
-    const dataString = `{"text": "${msg}"}`;
+    const dataString = `{
+      "blocks": [
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": "${msg}",
+            "emoji": true
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "가까운 선별진료소 및 검사 가능한 일반병원 찾아보기(링크 클릭 해주세요) <https://www.mohw.go.kr/react/popup_200128_3.html|선별진료소> / <https://www.mohw.go.kr/react/popup_200128.html|일반병원>"
+            }
+          ]
+        }
+      ]
+    }`;
+
     const options = {
       url: `https://hooks.slack.com/services/${process.env.KEY_WEBHOOK}`,
       method: 'POST',
