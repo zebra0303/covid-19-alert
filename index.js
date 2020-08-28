@@ -38,7 +38,7 @@ request({
     }
     console.log(seoul, total);
 
-    const msg = `:mask: 어제 서울지역 확진자 '${seoul.incDec}명 (전국 ${total.incDec}명)`;
+    const msg = `:mask: 어제 서울지역 확진자 ${seoul.incDec}명 (전국 ${total.incDec}명)`;
     console.log(`* environment: ${environment}\n* msg: ${msg}`);
 
     const headers = { 'Content-type': 'application/json' };
