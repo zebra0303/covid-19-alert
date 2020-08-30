@@ -6,7 +6,7 @@ const xml = require('xml-parse');
 const { getAPIURL, extractData, genSlackMsg,
   parseCliFlagValue, showError } = require('./lib');
 
-  // 입력 오류 체킹
+// 입력 오류 체킹
 const environment = parseCliFlagValue('env');
 
 if(environment !== 'prod' && environment !== 'test') {
