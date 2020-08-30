@@ -1,86 +1,76 @@
+// 확진자 통계를 가져올 지역 명 (Seoul 또는  서울)
+const areaCode = 'Seoul';
+
 const request = require('request');
 const xml = require('xml-parse');
-const { getDate, getAPIURL, extractData, parseCliFlagValue } = require('./lib');
+const { getAPIURL, extractData, genSlackMsg,
+  parseCliFlagValue, showError } = require('./lib');
 
+  // 입력 오류 체킹
 const environment = parseCliFlagValue('env');
+
 if(environment !== 'prod' && environment !== 'test') {
-    console.error("!!Error!! --env 플래그가 잘못 되었습니다.\n바른예) node index.js --env=test");
+    let msg = '!!Error!! --env 플래그가 잘못 되었습니다.\n';
+    msg += '바른예) node index.js --env=test';
+
+    console.error(msg);
     return false;
 }
 require('dotenv').config({path: `.env.${environment}`});
 
-// 어제 날짜 받아오기 YYYYMMDD
-const chkDate = getDate();
-const apiKey = process.env.KEY_API;
-const url = getAPIURL(chkDate, apiKey);
 
-let data;
-let seoul;
-let total;
+// 슬랙 웹훅 호출
+const callWebhook = data => {
+  console.log(`* Environment: ${environment}`);
 
-request({
-  url,
-  method: 'GET'
-}, (error, response, body) => {
-  if (response.statusCode === 200) {
-    const parsedData = xml.parse(body);
-    for (const node of parsedData[1].childNodes[1].childNodes[0].childNodes) {
-      data = extractData(node, 'Seoul');
-      if(Object.keys(data).length > 0) {
-        seoul = data;
-      }
+  const headers = { 'Content-type': 'application/json' };
+  const url = getAPIURL('slack');
+  const body = genSlackMsg(data);
+  const options = { url, method: 'POST', headers, body };
 
-      data = extractData(node, 'Total');
-      if(Object.keys(data).length > 0) {
-        total = data;
-      }
+  const callback = (error, response, body) => {
+    if (!error && response.statusCode == 200) {
+      console.log(`* Response: ${body}`);
     }
-    console.log(seoul, total);
-
-    const msg = `:mask: 어제 서울지역 확진자 ${seoul.incDec}명 (전국 ${total.incDec}명)`;
-    console.log(`* environment: ${environment}\n* msg: ${msg}`);
-
-    const headers = { 'Content-type': 'application/json' };
-    const dataString = `{
-      "blocks": [
-        {
-          "type": "header",
-          "text": {
-            "type": "plain_text",
-            "text": "${msg}",
-            "emoji": true
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "가까운 선별진료소 및 검사 가능한 일반병원 찾아보기(링크 클릭 해주세요) <https://www.mohw.go.kr/react/popup_200128_3.html|선별진료소> / <https://www.mohw.go.kr/react/popup_200128.html|일반병원>"
-            }
-          ]
-        }
-      ]
-    }`;
-
-    const options = {
-      url: `https://hooks.slack.com/services/${process.env.KEY_WEBHOOK}`,
-      method: 'POST',
-      headers,
-      body: dataString
-    };
-
-    const callback = (error, response, body) => {
-      if (!error && response.statusCode == 200) {
-        console.log(body);
-      }
-      else {
-        console.log('호출 에러!!!');
-        console.log(response.statusCode);
-        console.log(options);
-      }
+    else {
+      showError(response, options);
     }
-
-    request(options, callback);
   }
-});
+
+  request(options, callback);
+};
+
+// 코로나 정부 제공 API 호출
+const callAPI = areaCode => {
+  const url = getAPIURL('gov');
+  const options = { url, method: 'GET' };
+
+  const callback = (error, response, body) => {
+    let dataTemp, dataArea, dataTotal;
+
+    if (!error && response.statusCode === 200) {
+      const parsedData = xml.parse(body);
+      for (const node of parsedData[1].childNodes[1].childNodes[0].childNodes) {
+        dataTemp = extractData(node, areaCode);
+        if(Object.keys(dataTemp).length > 0) {
+          dataArea = dataTemp;
+        }
+
+        dataTemp = extractData(node, 'Total');
+        if(Object.keys(dataTemp).length > 0) {
+          dataTotal = dataTemp;
+        }
+      }
+
+      console.log(dataArea, dataTotal);
+      callWebhook({ area: dataArea, total: dataTotal });
+    }
+    else {
+      showError(response, options);
+    }
+  };
+
+  request(options, callback);
+};
+
+callAPI(areaCode);
