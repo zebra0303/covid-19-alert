@@ -1,6 +1,6 @@
 exports.getDate = () => {
   const date = new Date();
-  date.setDate(date.getDate() - 1);
+  date.setDate(date.getDate());
   const yyyy = date.getFullYear();
   let mm = 1 + date.getMonth();
   let dd = date.getDate();
