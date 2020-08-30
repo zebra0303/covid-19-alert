@@ -12,6 +12,7 @@
     "test": "node index.js --env=test"
   },
   "keywords": ["covid", "코로나"],
-  "author": "김세윤 (zebra0303@gmail.com)",
+  "author": "Larry Kim",
+  "email": "zebra0303@gmail.com",
   "license": "GPL"
 }
