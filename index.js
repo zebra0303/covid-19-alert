@@ -1,9 +1,11 @@
 // 확진자 통계를 가져올 지역 명 (Seoul 또는  서울)
 const areaCode = 'Seoul';
 
+// 오늘 기준 차감 일 - API업데이트가 늦어지면 -1 씩 차감
+let minDay = 0;
 const request = require('request');
 const xml = require('xml-parse');
-const { getAPIURL, extractData, genSlackMsg,
+const { getAPIURL, extractData, genSlackMsg, getDate,
   parseCliFlagValue, showError } = require('./lib');
 
 // 입력 오류 체킹
@@ -42,7 +44,8 @@ const callWebhook = data => {
 
 // 코로나 정부 제공 API 호출
 const callAPI = areaCode => {
-  const url = getAPIURL('gov');
+  const date = getDate(minDay);
+  const url = getAPIURL('gov', date);
   const options = { url, method: 'GET' };
 
   const callback = (error, response, body) => {
@@ -50,7 +53,25 @@ const callAPI = areaCode => {
 
     if (!error && response.statusCode === 200) {
       const parsedData = xml.parse(body);
-      for (const node of parsedData[1].childNodes[1].childNodes[0].childNodes) {
+      const pNode = parsedData[1].childNodes[1].childNodes[0];
+
+      if(typeof pNode.childNodes === 'undefined') {
+        if(minDay === 0) {
+          minDay += 1;
+          console.log('* Notice: 최근 날짜가 없어서 하루 전 데이타를 호출 합니다...\n');
+          callAPI(areaCode);
+          return true;
+        }
+        else {
+          console.error("아직 데이타가 업데이트 되지 않았습니다.\n");
+          console.error(`* 호출 URL : ${url}\n`);
+          console.error(parsedData);
+
+          return false;
+        }
+      }
+
+      for (const node of pNode.childNodes) {
         dataTemp = extractData(node, areaCode);
         if(Object.keys(dataTemp).length > 0) {
           dataArea = dataTemp;
@@ -63,7 +84,7 @@ const callAPI = areaCode => {
       }
 
       console.log(dataArea, dataTotal);
-      callWebhook({ area: dataArea, total: dataTotal });
+      callWebhook({ area: dataArea, total: dataTotal, date });
     }
     else {
       showError(response, options);

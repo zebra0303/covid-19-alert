@@ -1,20 +1,22 @@
 // 날짜 정보 가져오기 YYYYMMDD
-const getDate = () => {
+exports.getDate = minDay => {
   const date = new Date();
-  //date.setDate(date.getDate());
-  const yyyy = date.getFullYear();
+  if(minDay > 0) {
+    date.setDate(date.getDate() - minDay);
+  }
+  const yyyy = String(date.getFullYear());
   const mm = String(1 + date.getMonth()).padStart(2, '0')
   const dd = String(date.getDate()).padStart(2, '0');
 
-  return `${yyyy}${mm}${dd}`
+  return { 'year': yyyy, 'mon': mm, 'day': dd};
 };
 
 // 정부 또는 슬랙 API URL 리턴
-exports.getAPIURL = opt => {
+exports.getAPIURL = (opt, date) => {
   let url;
 
   if(opt === 'gov') {
-    const chkDate = getDate();
+    const chkDate = `${date.year}${date.mon}${date.day}`;
     url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson';
     url += `?ServiceKey=${process.env.KEY_API}&ServiceKey=-&pageNo=1`;
     url += `&numOfRows=10&startCreateDt=${chkDate}&endCreateDt=${chkDate}`;
@@ -52,8 +54,10 @@ exports.parseCliFlagValue = flagName => {
 };
 
 // 슬랙 메시지 제작
-exports.genSlackMsg = ({ area, total }) => {
-  const msg = `:mask: 어제 ${area.gubun}지역 확진자 ${area.incDec}명 (전국 ${total.incDec}명)`;
+exports.genSlackMsg = ({ area, total, date }) => {
+  console.log(date);
+  let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${area.incDec}명, 전국 ${total.incDec}명 `;
+  msg += `(${date.mon}월 ${date.day}일 00시 기준)`;
   console.log(`* Slack Message: ${msg}`);
 
   return `{
