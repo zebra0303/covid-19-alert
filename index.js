@@ -98,7 +98,7 @@ const callAPI = areaCode => {
       if (numChkDate > numPrevDate) {
         callWebhook({ area: dataArea, total: dataTotal, date });
       } else {
-        console.log(`* Skipped!!! 이미 전송된 날짜 정보 임! ${numChkDate} <= ${numPrevDate}`);
+        console.log(`* Skipped!!! 이미 전송된 날짜 정보 임! 현재날짜(${numChkDate}) <= 이전날짜(${numPrevDate})`);
       }
     }
     else {
