@@ -1,12 +1,15 @@
 // 확진자 통계를 가져올 지역 명 (Seoul 또는  서울)
 const areaCode = 'Seoul';
 
+// 로그 파일 명 (날짜 정보를 저장해서 이미 보낸 정보면  스킵하도록 함)
+const logFile = './date.log';
+
 // 오늘 기준 차감 일 - API업데이트가 늦어지면 -1 씩 차감
 let minDay = 0;
 const request = require('request');
 const xml = require('xml-parse');
 const { getAPIURL, extractData, genSlackMsg, getDate,
-  parseCliFlagValue, showError } = require('./lib');
+  parseCliFlagValue, showError, readDateLog, writeDateLog } = require('./lib');
 
 // 입력 오류 체킹
 const environment = parseCliFlagValue('env');
@@ -33,6 +36,7 @@ const callWebhook = data => {
   const callback = (error, response, body) => {
     if (!error && response.statusCode == 200) {
       console.log(`* Response: ${body}`);
+      writeDateLog(logFile, data.date);
     }
     else {
       showError(response, options);
@@ -58,6 +62,7 @@ const callAPI = areaCode => {
       if(typeof pNode.childNodes === 'undefined') {
         if(minDay === 0) {
           minDay += 1;
+          //console.log(date);
           console.log('* Notice: 최근 날짜가 없어서 하루 전 데이타를 호출 합니다...\n');
           callAPI(areaCode);
           return true;
@@ -84,7 +89,17 @@ const callAPI = areaCode => {
       }
 
       console.log(dataArea, dataTotal);
-      callWebhook({ area: dataArea, total: dataTotal, date });
+
+      // 이미 보낸 슬랙 웹훅인지 체킹
+      const numPrevDate = Number(readDateLog(logFile));
+      const numChkDate = Number(`${date.year}${date.mon}${date.day}`);
+      //console.log(numChkDate > numPrevDate, numChkDate, numPrevDate);
+
+      if (numChkDate > numPrevDate) {
+        callWebhook({ area: dataArea, total: dataTotal, date });
+      } else {
+        console.log(`* Skipped!!! 이미 전송된 날짜 정보 임! ${numChkDate} <= ${numPrevDate}`);
+      }
     }
     else {
       showError(response, options);

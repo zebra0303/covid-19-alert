@@ -5,13 +5,17 @@
   "main": "index.js",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "fs": "0.0.1-security",
     "request": "^2.88.2",
     "xml-parse": "^0.4.0"
   },
   "scripts": {
     "test": "node index.js --env=test"
   },
-  "keywords": ["covid", "코로나"],
+  "keywords": [
+    "covid",
+    "코로나"
+  ],
   "author": "Larry Kim",
   "email": "zebra0303@gmail.com",
   "license": "GPL"

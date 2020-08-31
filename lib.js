@@ -11,6 +11,27 @@ exports.getDate = minDay => {
   return { 'year': yyyy, 'mon': mm, 'day': dd};
 };
 
+// 로그 데이타 읽기
+exports.readDateLog = logFile => {
+  const fs = require('fs');
+
+  return fs.readFileSync(logFile, 'utf8');
+}
+
+// 로그 데이타 저장
+exports.writeDateLog = (logFile, date) => {
+  const fs = require('fs');
+  const logData = `${date.year}${date.mon}${date.day}`;
+
+  fs.writeFile(logFile, logData, err => {
+    if (err === null) {
+      console.log(`* 로그 저장 성공 : ${logData}`);
+    } else {
+      console.error(`* 로그 저장 실패 : ${logData}`);
+    }
+  });
+};
+
 // 정부 또는 슬랙 API URL 리턴
 exports.getAPIURL = (opt, date) => {
   let url;
