@@ -1,9 +1,6 @@
 // 확진자 통계를 가져올 지역 명 (Seoul 또는  서울)
 const areaCode = 'Seoul';
 
-// 로그 파일 명 (날짜 정보를 저장해서 이미 보낸 정보면  스킵하도록 함)
-const logFile = './date.log';
-
 // 오늘 기준 차감 일 - API업데이트가 늦어지면 -1 씩 차감
 let minDay = 0;
 const request = require('request');
@@ -23,6 +20,9 @@ if(environment !== 'prod' && environment !== 'test') {
 }
 require('dotenv').config({path: `.env.${environment}`});
 
+
+// 로그 파일 명 (날짜 정보를 저장해서 이미 보낸 정보면  스킵하도록 함)
+const logFile = `./date.${environment}.log`;
 
 // 슬랙 웹훅 호출
 const callWebhook = data => {
