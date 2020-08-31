@@ -14,8 +14,12 @@ exports.getDate = minDay => {
 // 로그 데이타 읽기
 exports.readDateLog = logFile => {
   const fs = require('fs');
-
-  return fs.readFileSync(logFile, 'utf8');
+  if (fs.existsSync(logFile)) {
+    return fs.readFileSync(logFile, 'utf8');
+  }
+  else {
+    return '12251225';
+  }
 }
 
 // 로그 데이타 저장
