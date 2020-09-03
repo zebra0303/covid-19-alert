@@ -40,13 +40,13 @@ exports.writeDateLog = (logFile, date) => {
 exports.getAPIURL = (opt, date) => {
   let url;
 
-  if(opt === 'gov') {
+  if (opt === 'gov') {
     const chkDate = `${date.year}${date.mon}${date.day}`;
     url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson';
     url += `?ServiceKey=${process.env.KEY_API}&ServiceKey=-&pageNo=1`;
     url += `&numOfRows=10&startCreateDt=${chkDate}&endCreateDt=${chkDate}`;
   }
-  else if(opt === 'slack') {
+  else if (opt === 'slack') {
     url =  `https://hooks.slack.com/services/${process.env.KEY_WEBHOOK}`;
   }
 
