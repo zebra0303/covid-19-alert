@@ -49,6 +49,16 @@ const callWebhook = data => {
 // 코로나 정부 제공 API 호출
 const callAPI = areaCode => {
   const date = getDate(minDay);
+
+  // 이미 보낸 슬랙 웹훅인지 체킹
+  const numLogDate = Number(readDateLog(logFile));
+  const numChkDate = Number(`${date.year}${date.mon}${date.day}`);
+  //console.log(numChkDate > numLogDate, numChkDate, numLogDate);
+  if (numChkDate <= numLogDate) {
+    console.log(`* Skipped!!! 해당 날짜의 정보는 이미 전송었습니다! 체크날짜(${numChkDate}) <= 로그날짜(${numLogDate})`);
+    return false;
+  }
+
   const url = getAPIURL('gov', date);
   const options = { url, method: 'GET' };
 
@@ -89,17 +99,7 @@ const callAPI = areaCode => {
       }
 
       console.log(dataArea, dataTotal);
-
-      // 이미 보낸 슬랙 웹훅인지 체킹
-      const numPrevDate = Number(readDateLog(logFile));
-      const numChkDate = Number(`${date.year}${date.mon}${date.day}`);
-      //console.log(numChkDate > numPrevDate, numChkDate, numPrevDate);
-
-      if (numChkDate > numPrevDate) {
-        callWebhook({ area: dataArea, total: dataTotal, date });
-      } else {
-        console.log(`* Skipped!!! 이미 전송된 날짜 정보 임! 현재날짜(${numChkDate}) <= 이전날짜(${numPrevDate})`);
-      }
+      callWebhook({ area: dataArea, total: dataTotal, date });
     }
     else {
       showError(response, options);
