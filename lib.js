@@ -114,6 +114,16 @@ exports.genSlackMsg = ({ area, total, date }) => {
   return `{
     "blocks": [
       {
+        "type": "image",
+        "title": {
+          "type": "plain_text",
+          "text": "일별 확진환자 발생 추세",
+          "emoji": true
+        },
+        "image_url": "${process.env.PLOTLY_IMG_URL}",
+        "alt_text": "일별 확진환자 발생 추세"
+      },
+      {
         "type": "header",
         "text": {
           "type": "plain_text",
@@ -122,18 +132,11 @@ exports.genSlackMsg = ({ area, total, date }) => {
         }
       },
       {
-        "type": "image",
-        "image_url": "${process.env.PLOTLY_IMG_URL}",
-        "alt_text": "inspiration"
-      },
-      {
         "type": "section",
-        "fields": [
-          {
-            "type": "mrkdwn",
-            "text": "가까운 선별진료소 및 검사 가능한 일반병원 찾아보기(링크 클릭 해주세요) <https://www.mohw.go.kr/react/popup_200128_3.html|선별진료소> / <https://www.mohw.go.kr/react/popup_200128.html|일반병원>"
-          }
-        ]
+        "text": {
+          "type": "mrkdwn",
+          "text": "가까운 선별진료소 및 검사 가능한 일반병원 찾아보기 (링크를 클릭하세요)\n<https://www.mohw.go.kr/react/popup_200128_3.html|선별진료소> / <https://www.mohw.go.kr/react/popup_200128.html|일반병원>"
+        }
       }
     ]
   }`;
