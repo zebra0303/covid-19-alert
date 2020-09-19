@@ -11,6 +11,16 @@ exports.getDate = minDay => {
   return { 'year': yyyy, 'mon': mm, 'day': dd};
 };
 
+// 요일 인덱스값 가져오기 Sunday - Saturday : 0 - 6
+exports.getWeekyIdx = minDay => {
+  const date = new Date();
+  if(minDay > 0) {
+    date.setDate(date.getDate() - minDay);
+  }
+
+  return date.getDay();
+};
+
 // 로그 데이타 읽기
 exports.readDateLog = logFile => {
   const fs = require('fs');
@@ -36,6 +46,22 @@ exports.writeDateLog = (logFile, date) => {
   });
 };
 
+// weekly데이타 저장
+exports.writeWeeklyData = ({ area, total }) => {
+  const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const fs = require('fs');
+  const path = `./weeklyData/${arrWeek[this.getWeekyIdx(0)]}.js`;
+  const data = `exports.data = {total: ${total.incDec}, area: ${area.incDec}};\n`;
+
+  fs.writeFileSync(path, data, err => {
+    if (err === null) {
+      console.log(`* 요일 데이타 저장 성공 : ${data}`);
+    } else {
+      console.error(`* 요일 데이타 저장 성공 : ${data}`);
+    }
+  });
+};
+
 // 정부 또는 슬랙 API URL 리턴
 exports.getAPIURL = (opt, date) => {
   let url;
@@ -43,11 +69,11 @@ exports.getAPIURL = (opt, date) => {
   if (opt === 'gov') {
     const chkDate = `${date.year}${date.mon}${date.day}`;
     url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson';
-    url += `?ServiceKey=${process.env.KEY_API}&ServiceKey=-&pageNo=1`;
+    url += `?ServiceKey=${process.env.DATA_API_KEY}&ServiceKey=-&pageNo=1`;
     url += `&numOfRows=10&startCreateDt=${chkDate}&endCreateDt=${chkDate}`;
   }
   else if (opt === 'slack') {
-    url =  `https://hooks.slack.com/services/${process.env.KEY_WEBHOOK}`;
+    url =  `https://hooks.slack.com/services/${process.env.SLACK_WEBHOOK_KEY}`;
   }
 
   return url;
@@ -94,6 +120,11 @@ exports.genSlackMsg = ({ area, total, date }) => {
           "text": "${msg}",
           "emoji": true
         }
+      },
+      {
+        "type": "image",
+        "image_url": "${process.env.PLOTLY_IMG_URL}",
+        "alt_text": "inspiration"
       },
       {
         "type": "section",

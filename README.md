@@ -9,8 +9,8 @@ npm install
 
 .env.prod 와 .env.test 파일을 생성 후 각 키값 등록 
 ```
-KEY_WEBHOOK=SLACK WEBHOOK KEY
-KEY_API=OPEN API KEY
+SLACK_WEBHOOK_KEY=SLACK WEBHOOK KEY
+DATA_API_KEY=OPEN API KEY
 ```
 
 ## 실행

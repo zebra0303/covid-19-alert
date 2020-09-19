@@ -6,7 +6,9 @@ let minDay = 0;
 const request = require('request');
 const xml = require('xml-parse');
 const { getAPIURL, extractData, genSlackMsg, getDate,
-  parseCliFlagValue, showError, readDateLog, writeDateLog } = require('./lib');
+  parseCliFlagValue, showError, readDateLog, writeWeeklyData,
+  writeDateLog } = require('./lib');
+const { genPlotly } = require('./genPlotly');
 
 // 입력 오류 체킹
 const environment = parseCliFlagValue('env');
@@ -56,7 +58,7 @@ const callAPI = areaCode => {
   //console.log(numChkDate > numLogDate, numChkDate, numLogDate);
   if (numChkDate <= numLogDate) {
     console.log(`* Skipped!!! 해당 날짜의 정보는 이미 전송었습니다! 체크날짜(${numChkDate}) <= 로그날짜(${numLogDate})`);
-    return false;
+    //return false;
   }
 
   const url = getAPIURL('gov', date);
@@ -99,7 +101,9 @@ const callAPI = areaCode => {
       }
 
       console.log(dataArea, dataTotal);
-      callWebhook({ area: dataArea, total: dataTotal, date });
+      // weeklyData 저장  후 그래프 이미지 생성
+      writeWeeklyData({ area: dataArea, total: dataTotal});
+      genPlotly(callWebhook, { area: dataArea, total: dataTotal, date });
     }
     else {
       showError(response, options);
