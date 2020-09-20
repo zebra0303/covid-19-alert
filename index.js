@@ -61,7 +61,7 @@ const callAPI = areaCode => {
   if (numChkDate <= numLogDate) {
     console.log(`* Skipped!!! 해당 날짜의 정보는 이미 전송었습니다! 체크날짜(${numChkDate}) <= 로그날짜(${numLogDate})`);
 
-    return false;
+    //return false;
   }
 
   const url = getAPIURL('gov', date);
@@ -106,8 +106,7 @@ const callAPI = areaCode => {
       console.log(dataArea, dataTotal);
       // weeklyData 저장  후 그래프 이미지 생성
       writeWeeklyData({ area: dataArea, total: dataTotal});
-      const plotlyImgURL = await genPlotly();
-
+      const plotlyImgURL = await genPlotly(date);
       callWebhook({ area: dataArea, total: dataTotal, date, img: {url: plotlyImgURL} });
     }
     else {

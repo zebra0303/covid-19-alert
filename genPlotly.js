@@ -1,5 +1,4 @@
-
-exports.genPlotly = () => {
+exports.genPlotly = (date) => {
   const fs = require('fs');
   const { getDate, getWeekyIdx } = require('./lib');
   const plotly = require('plotly')(process.env.PLOTLY_ID, process.env.PLOTLY_KEY);
@@ -42,9 +41,30 @@ exports.genPlotly = () => {
 
   return new Promise((resolve, reject) => {
     plotly.plot(data, graphOptions, function (err, msg) {
-      const img_url = `${msg.url}.png`;
+      const img_url = `${msg.url}.png?_t=${(new Date()).valueOf()}`;
       console.log(`* Polyglot 이미지 URL : ${img_url}`);
-      resolve(img_url);
+      console.debug(date)
+      // upload to imgBB
+      const options = {
+        uri:'https://api.imgbb.com/1/upload',
+        method: 'POST',
+        form: {
+          key: `${process.env.IMG_BB_API_KEY}`,
+          image: img_url,
+          name: `covid-19-${date.year}-${date.mon}-${date.day}.png`
+        }
+      };
+      console.debug(options);
+      const request = require('request');
+      request.post(options, function(err, httpResponse, body){
+        if (httpResponse.statusCode === 200) {
+          const objData = JSON.parse(body).data;
+          console.debug(objData);
+          resolve(objData.url);
+        } else {
+          reject(new Error('File upload Error!!!'));
+        }
+      });
     });
   });
 };
