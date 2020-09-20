@@ -1,5 +1,5 @@
 
-exports.genPlotly = (callback, cbData) => {
+exports.genPlotly = () => {
   const fs = require('fs');
   const { getDate, getWeekyIdx } = require('./lib');
   const plotly = require('plotly')(process.env.PLOTLY_ID, process.env.PLOTLY_KEY);
@@ -40,9 +40,11 @@ exports.genPlotly = (callback, cbData) => {
   const layout = {width: 430, height: 150, margin: {l:30, r:0, t:0, b:42}};
   const graphOptions = {filename: "covid-19", fileopt: "overwrite", layout};
 
-  plotly.plot(data, graphOptions, function (err, msg) {
-    const img_url = `${msg.url}.png`;
-    console.log(`* Polyglot 이미지 URL : ${img_url}`);
-    callback(cbData);
+  return new Promise((resolve, reject) => {
+    plotly.plot(data, graphOptions, function (err, msg) {
+      const img_url = `${msg.url}.png`;
+      console.log(`* Polyglot 이미지 URL : ${img_url}`);
+      resolve(img_url);
+    });
   });
 };

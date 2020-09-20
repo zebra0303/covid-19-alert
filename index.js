@@ -67,7 +67,7 @@ const callAPI = areaCode => {
   const url = getAPIURL('gov', date);
   const options = { url, method: 'GET' };
 
-  const callback = (error, response, body) => {
+  const callback = async (error, response, body) => {
     let dataTemp, dataArea, dataTotal;
 
     if (!error && response.statusCode === 200) {
@@ -106,7 +106,9 @@ const callAPI = areaCode => {
       console.log(dataArea, dataTotal);
       // weeklyData 저장  후 그래프 이미지 생성
       writeWeeklyData({ area: dataArea, total: dataTotal});
-      genPlotly(callWebhook, { area: dataArea, total: dataTotal, date });
+      const plotlyImgURL = await genPlotly();
+
+      callWebhook({ area: dataArea, total: dataTotal, date, img: {url: plotlyImgURL} });
     }
     else {
       showError(response, options);

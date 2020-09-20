@@ -105,7 +105,7 @@ exports.parseCliFlagValue = flagName => {
 };
 
 // 슬랙 메시지 제작
-exports.genSlackMsg = ({ area, total, date, news }) => {
+exports.genSlackMsg = ({ area, total, date, img, news }) => {
   let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${area.incDec}명, 전국 ${total.incDec}명 `;
   msg += `(${date.mon}월 ${date.day}일 00시 기준)`;
   console.log(`* Slack Message: ${msg}`);
@@ -126,8 +126,8 @@ exports.genSlackMsg = ({ area, total, date, news }) => {
           "text": "일별 확진환자 발생 추세",
           "emoji": true
         },
-        "image_url": "${process.env.PLOTLY_IMG_URL}?_t=${unixTime}",
-        "alt_text": "일별 확진환자 발생 추세"
+        "image_url": "${img.url}?_t=${unixTime}",
+        "alt_text": "일별 확진자 발생 추이"
       },
       {
         "type": "header",
