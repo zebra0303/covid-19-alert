@@ -123,11 +123,11 @@ exports.genSlackMsg = ({ area, total, date, img, news }) => {
         "type": "image",
         "title": {
           "type": "plain_text",
-          "text": "일별 확진환자 발생 추세",
+          "text": "일별 확진자 발생 추이",
           "emoji": true
         },
         "image_url": "${img.url}?_t=${unixTime}",
-        "alt_text": "일별 확진자 발생 추이"
+        "alt_text": "일별 확진자 발생 추이 그래프"
       },
       {
         "type": "header",
