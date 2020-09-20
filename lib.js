@@ -112,7 +112,7 @@ exports.genSlackMsg = ({ area, total, date, news }) => {
   console.log(`* Slack Message: ${msg}`);
   let newsList = '';
   for(item of news) {
-    newsList += `* <${item.link}|${item.title}>`;
+    newsList += `• <${item.link}|${item.title}>`;
     newsList += '\n';
   }
 
