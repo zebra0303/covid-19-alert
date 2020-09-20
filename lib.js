@@ -105,11 +105,17 @@ exports.parseCliFlagValue = flagName => {
 };
 
 // 슬랙 메시지 제작
-exports.genSlackMsg = ({ area, total, date }) => {
+exports.genSlackMsg = ({ area, total, date, news }) => {
   console.log(date);
   let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${area.incDec}명, 전국 ${total.incDec}명 `;
   msg += `(${date.mon}월 ${date.day}일 00시 기준)`;
   console.log(`* Slack Message: ${msg}`);
+  let newsList = '';
+  for(item of news) {
+    newsList += `* <${item.link}|${item.title}>`;
+    newsList += '\n';
+  }
+
 
   return `{
     "blocks": [
@@ -137,7 +143,22 @@ exports.genSlackMsg = ({ area, total, date }) => {
           "type": "mrkdwn",
           "text": "가까운 선별진료소 및 검사 가능한 일반병원 찾아보기 (링크를 클릭하세요)\n<https://www.mohw.go.kr/react/popup_200128_3.html|선별진료소> / <https://www.mohw.go.kr/react/popup_200128.html|일반병원>"
         }
-      }
+      },
+      {
+        "type": "header",
+        "text": {
+          "type": "plain_text",
+          "text": ":newspaper: 관련 뉴스",
+          "emoji": true
+        }
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "${newsList}"
+        }
+      },
     ]
   }`;
 };
@@ -147,3 +168,31 @@ exports.showError = (response, options) => {
   console.error(response.statusCode);
   console.error(options);
 };
+
+exports.getGoogleNews = async (keyword, cntItem=3) => {
+  let Parser = require('rss-parser');
+  let parser = new Parser();
+  const arrNews = [];
+
+  const urlRSSFeed = process.env.GOOGLE_NEWS_FEED;
+  let feed = await parser.parseURL(urlRSSFeed);
+
+  let chkCntItem = 0;
+  const lenTitle = 45;
+  for (let i = 0; i < cntItem; i++) {
+    const item = feed.items[i];
+    let title = item.title.replace(/\"/g, '\\"').trim();
+      //.replace(/<\/?b>/ig, '')
+      //.replace(/&#39;/g, '\'')
+      //.replace('...', '');
+    if(title.length > lenTitle) {
+      title = title.substring(0, lenTitle).trim() + '...';
+    }
+    const link = item.link;
+    //decodeURIComponent(item.link.replace(/^http.+url=/, '').replace(/&ct=.+$/, ''));
+
+    arrNews.push({title, link});
+  }
+  console.debug(arrNews);
+  return arrNews;
+}

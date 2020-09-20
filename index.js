@@ -7,7 +7,7 @@ const request = require('request');
 const xml = require('xml-parse');
 const { getAPIURL, extractData, genSlackMsg, getDate,
   parseCliFlagValue, showError, readDateLog, writeWeeklyData,
-  writeDateLog } = require('./lib');
+  writeDateLog, getGoogleNews } = require('./lib');
 const { genPlotly } = require('./genPlotly');
 
 // 입력 오류 체킹
@@ -22,13 +22,15 @@ if(environment !== 'prod' && environment !== 'test') {
 }
 require('dotenv').config({path: `.env.${environment}`});
 
-
 // 로그 파일 명 (날짜 정보를 저장해서 이미 보낸 정보면  스킵하도록 함)
 const logFile = `./date.${environment}.log`;
 
 // 슬랙 웹훅 호출
-const callWebhook = data => {
+const callWebhook = async (data) => {
   console.log(`* Environment: ${environment}`);
+
+  // 구글 뉴스 불러오기
+  data.news = await getGoogleNews('코로나 바이러스');
 
   const headers = { 'Content-type': 'application/json' };
   const url = getAPIURL('slack');
@@ -58,7 +60,7 @@ const callAPI = areaCode => {
   //console.log(numChkDate > numLogDate, numChkDate, numLogDate);
   if (numChkDate <= numLogDate) {
     console.log(`* Skipped!!! 해당 날짜의 정보는 이미 전송었습니다! 체크날짜(${numChkDate}) <= 로그날짜(${numLogDate})`);
-    return false;
+    //return false;
   }
 
   const url = getAPIURL('gov', date);
