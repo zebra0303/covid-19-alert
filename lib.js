@@ -159,6 +159,20 @@ exports.genSlackMsg = ({ area, total, date, news }) => {
           "text": "${newsList}"
         }
       },
+      {
+        "type": "actions",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "더보기",
+              "emoji": true
+            },
+            "url": "${process.env.GOOGLE_NEWS_URL}",
+          }
+        ]
+      }
     ]
   }`;
 };
