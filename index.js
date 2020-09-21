@@ -30,7 +30,7 @@ const callWebhook = async (data) => {
   console.log(`* Environment: ${environment}`);
 
   // 구글 뉴스 불러오기
-  data.news = await getGoogleNews('코로나 바이러스');
+  data.news = await getGoogleNews();
 
   const headers = { 'Content-type': 'application/json' };
   const url = getAPIURL('slack');

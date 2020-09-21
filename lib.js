@@ -183,7 +183,7 @@ exports.showError = (response, options) => {
   console.error(options);
 };
 
-exports.getGoogleNews = async (keyword, cntItem=3) => {
+exports.getGoogleNews = async (cntItem = 3) => {
   let Parser = require('rss-parser');
   let parser = new Parser();
   const arrNews = [];
@@ -195,12 +195,12 @@ exports.getGoogleNews = async (keyword, cntItem=3) => {
   const lenTitle = 45;
   for (let i = 0; i < cntItem; i++) {
     const item = feed.items[i];
-    let title = item.title.replace(/\"/g, '\\"').trim();
+    let title = item.title.replace(/\"/g, '\\"').replace(/ - [^-]+$/, '').trim();
       //.replace(/<\/?b>/ig, '')
       //.replace(/&#39;/g, '\'')
       //.replace('...', '');
     if(title.length > lenTitle) {
-      title = title.substring(0, lenTitle).trim() + '...';
+      title = title.substring(0, lenTitle).trim().replace(/(?:…|\.+)$/, '').trim() + '…';
     }
     const link = item.link;
     //decodeURIComponent(item.link.replace(/^http.+url=/, '').replace(/&ct=.+$/, ''));
