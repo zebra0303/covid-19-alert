@@ -73,7 +73,7 @@ const callAPI = areaCode => {
     if (!error && response.statusCode === 200) {
       const parsedData = xml.parse(body);
 
-	  if (typeof parsedData[1].childNodes[1].childNodes !== 'array') {
+	  if (typeof parsedData[1].childNodes[1].childNodes === 'undefined') {
         console.error("XML 데이타 오류!!!\n");
         console.error(`* 호출 URL : ${url}\n`);
         console.error(parsedData);
