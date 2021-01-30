@@ -195,7 +195,9 @@ exports.getGoogleNews = async (cntItem = 3) => {
   const lenTitle = 45;
   for (let i = 0; i < cntItem; i++) {
     const item = feed.items[i];
-    let title = item.title.replace(/\"/g, '\\"').replace(/ - [^-]+$/, '').trim();
+    let title = item.title.replace(/\"/g, '\\"').replace(/ - [^-]+$/, '')
+      .replace(/\s[<\-\|:]\s.+$/, '')  // ' - 한국어 방송' 같은 문구 제거
+      .trim();
       //.replace(/<\/?b>/ig, '')
       //.replace(/&#39;/g, '\'')
       //.replace('...', '');
