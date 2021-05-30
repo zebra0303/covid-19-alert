@@ -51,7 +51,11 @@ exports.writeWeeklyData = ({ area, total }) => {
   const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const fs = require('fs');
   const path = `./weeklyData/${arrWeek[this.getWeekyIdx(0)]}.js`;
-  const data = `exports.data = {total: ${total.incDec}, area: ${area.incDec}};\n`;
+  const objCnt = {
+    total: parseInt(total.localOccCnt, 10) + parseInt(total.overFlowCnt, 10),
+    area: parseInt(area.localOccCnt, 10) + parseInt(area.overFlowCnt, 10)
+  };
+  const data = `exports.data = {total: ${objCnt.total}, area: ${objCnt.area}};\n`;
 
   fs.writeFileSync(path, data, err => {
     if (err === null) {
@@ -106,7 +110,11 @@ exports.parseCliFlagValue = flagName => {
 
 // 슬랙 메시지 제작
 exports.genSlackMsg = ({ area, total, date, img, news }) => {
-  let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${area.incDec}명, 전국 ${total.incDec}명 `;
+  const objCnt = {
+    total: parseInt(total.localOccCnt, 10) + parseInt(total.overFlowCnt, 10),
+    area: parseInt(area.localOccCnt, 10) + parseInt(area.overFlowCnt, 10)
+  };
+  let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${objCnt.area}명, 전국 ${objCnt.total}명 `;
   msg += `(${date.mon}월 ${date.day}일 00시 기준)`;
   console.log(`* Slack Message: ${msg}`);
   let newsList = '';
