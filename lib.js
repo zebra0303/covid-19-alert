@@ -133,7 +133,7 @@ exports.genSlackMsg = ({ area, total, date, img, news }) => {
   }
 
   const unixTime = (new Date()).valueOf();
-
+  const rateDeath = ((total.plusDeathCnt*100)/objCnt.total).toFixed(3);
   return `{
     "blocks": [
       {
@@ -158,7 +158,7 @@ exports.genSlackMsg = ({ area, total, date, img, news }) => {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": ":br: 누적 사망자 ${this.addComma(total.deathCnt)}명 (추가 ${this.addComma(total.plusDeathCnt)}명) <https://coronaboard.kr/|실시간 상황판>"
+          "text": ":br: 누적 사망자 ${this.addComma(total.deathCnt)}명 (추가 ${this.addComma(total.plusDeathCnt)}명, 전일 사망율 : ${rateDeath}%) <https://coronaboard.kr/|실시간 상황판>"
         }
       },
       {
