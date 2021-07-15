@@ -1,6 +1,6 @@
 exports.genPlotly = (date) => {
   const fs = require('fs');
-  const { getDate, getWeekyIdx } = require('./lib');
+  const { getDate, getWeekIdx } = require('./lib');
   const plotly = require('plotly')(process.env.PLOTLY_ID, process.env.PLOTLY_KEY);
 
   const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -10,7 +10,7 @@ exports.genPlotly = (date) => {
 
   for (let i = 6; i >= 0; i--) {
     const objDate = getDate(i);
-    const idxDate = getWeekyIdx(i);
+    const idxDate = getWeekIdx(i);
     const fileWeeklyData = `./weeklyData/${arrWeek[idxDate]}`;
 
     const { data } = require(fileWeeklyData);

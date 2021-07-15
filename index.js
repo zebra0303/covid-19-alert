@@ -5,7 +5,7 @@ const areaCode = 'Seoul';
 let minDay = 0;
 const request = require('request');
 const xml = require('xml-parse');
-const { getAPIURL, extractData, genSlackMsg, getDate,
+const { getAPIURL, extractData, genSlackMsg, getDate, getWeekIdx,
   parseCliFlagValue, showError, readDateLog, writeWeeklyData,
   writeDateLog, getGoogleNews } = require('./lib');
 const { genPlotly } = require('./genPlotly');
@@ -73,13 +73,13 @@ const callAPI = areaCode => {
     if (!error && response.statusCode === 200) {
       const parsedData = xml.parse(body);
 
-	  if (typeof parsedData[1].childNodes[1].childNodes === 'undefined') {
-        console.error("XML 데이타 오류!!!\n");
-        console.error(`* 호출 URL : ${url}\n`);
-        console.error(parsedData);
+    if (typeof parsedData[1].childNodes[1].childNodes === 'undefined') {
+      console.error("XML 데이타 오류!!!\n");
+      console.error(`* 호출 URL : ${url}\n`);
+      console.error(parsedData);
 
-		return false;
-	  }
+      return false;
+    }
 
 
       const pNode = parsedData[1].childNodes[1].childNodes[0];
@@ -112,6 +112,17 @@ const callAPI = areaCode => {
           dataTotal = dataTemp;
         }
       }
+
+      // 추가 사망자 계산
+      const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+      const yesterdayWeekIdx = getWeekIdx(1);
+      const fileWeeklyData = `./weeklyData/${arrWeek[yesterdayWeekIdx]}`;
+      const { 'data' : yesterdayData} = require(fileWeeklyData);
+      if (typeof yesterdayData.death === 'undefined') {
+        yesterdayData.death = 0;
+      }
+
+      dataTotal.plusDeathCnt = dataTotal.deathCnt - yesterdayData.death;
 
       console.log(dataArea, dataTotal);
       // weeklyData 저장  후 그래프 이미지 생성

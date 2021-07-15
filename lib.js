@@ -12,7 +12,7 @@ exports.getDate = minDay => {
 };
 
 // 요일 인덱스값 가져오기 Sunday - Saturday : 0 - 6
-exports.getWeekyIdx = minDay => {
+exports.getWeekIdx = minDay => {
   const date = new Date();
   if(minDay > 0) {
     date.setDate(date.getDate() - minDay);
@@ -50,12 +50,13 @@ exports.writeDateLog = (logFile, date) => {
 exports.writeWeeklyData = ({ area, total }) => {
   const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const fs = require('fs');
-  const path = `./weeklyData/${arrWeek[this.getWeekyIdx(0)]}.js`;
+  const path = `./weeklyData/${arrWeek[this.getWeekIdx(0)]}.js`;
   const objCnt = {
     total: parseInt(total.localOccCnt, 10) + parseInt(total.overFlowCnt, 10),
-    area: parseInt(area.localOccCnt, 10) + parseInt(area.overFlowCnt, 10)
+    area: parseInt(area.localOccCnt, 10) + parseInt(area.overFlowCnt, 10),
+    death: total.deathCnt
   };
-  const data = `exports.data = {total: ${objCnt.total}, area: ${objCnt.area}};\n`;
+  const data = `exports.data = {total: ${objCnt.total}, area: ${objCnt.area}, death: ${objCnt.death}};\n`;
 
   fs.writeFileSync(path, data, err => {
     if (err === null) {
@@ -108,13 +109,21 @@ exports.parseCliFlagValue = flagName => {
   return undefined;
 };
 
+exports.addComma = num => {
+  if (typeof num !== 'number') {
+    num = parseInt(num, 10);
+  }
+
+  return num.toLocaleString('en-US')
+};
+
 // 슬랙 메시지 제작
 exports.genSlackMsg = ({ area, total, date, img, news }) => {
   const objCnt = {
     total: parseInt(total.localOccCnt, 10) + parseInt(total.overFlowCnt, 10),
     area: parseInt(area.localOccCnt, 10) + parseInt(area.overFlowCnt, 10)
   };
-  let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${objCnt.area}명, 전국 ${objCnt.total}명 `;
+  let msg = `:mask: ${area.gubun} 지역 추가 확진자 ${this.addComma(objCnt.area)}명, 전국 ${this.addComma(objCnt.total)}명 `;
   msg += `(${date.mon}월 ${date.day}일 00시 기준)`;
   console.log(`* Slack Message: ${msg}`);
   let newsList = '';
@@ -143,6 +152,13 @@ exports.genSlackMsg = ({ area, total, date, img, news }) => {
           "type": "plain_text",
           "text": "${msg}",
           "emoji": true
+        }
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": ":br: 누적 사망자 ${this.addComma(total.deathCnt)}명 (추가 ${this.addComma(total.plusDeathCnt)}명) <https://coronaboard.kr/|실시간 상황판>"
         }
       },
       {
