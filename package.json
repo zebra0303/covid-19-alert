@@ -4,6 +4,7 @@
   "description": "정부 오픈 API를 통해서 받아온 지역 확진자 수를 슬랙 채널에서 보여주는 프로그램",
   "main": "index.js",
   "dependencies": {
+    "chart.js-image": "^6.0.3",
     "dotenv": "^8.2.0",
     "fs": "0.0.1-security",
     "plotly": "^1.0.6",
