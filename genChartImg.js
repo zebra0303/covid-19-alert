@@ -42,7 +42,7 @@ exports.genChartImg = (date) => {
     }
   };
 
-  const layout = {width: 330, height: 150, margin: {l:30, r:0, t:0, b:42}};
+  const layout = {width: 450, height: 160, margin: {l:30, r:0, t:0, b:42}};
   const graphOptions = {filename: "covid-19", fileopt: "overwrite", layout};
 
   return new Promise((resolve, reject) => {
