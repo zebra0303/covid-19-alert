@@ -41,14 +41,14 @@ exports.genChartImg = (date) => {
     }
   };
 
-  const layout = {width: 430, height: 150, margin: {l:30, r:0, t:0, b:42}};
+  const layout = {width: 330, height: 150, margin: {l:30, r:0, t:0, b:42}};
   const graphOptions = {filename: "covid-19", fileopt: "overwrite", layout};
 
   return new Promise((resolve, reject) => {
     const chart = ChartJSImage().chart(data)
       .backgroundColor('white')
-      .width(400) // 500px
-      .height(200);
+      .width(layout.width)
+      .height(layout.height);
 
     const img_url = chart.toURL();
     console.log(`* Chart Image URL : ${img_url}`);
