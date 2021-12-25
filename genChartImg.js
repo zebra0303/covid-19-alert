@@ -14,7 +14,8 @@ exports.genChartImg = (date) => {
     const fileWeeklyData = `./weeklyData/${arrWeek[idxDate]}`;
 
     const { data } = require(fileWeeklyData);
-    arrDate.push(`${objDate.mon}/${objDate.day}`);
+    //arrDate.push(`${objDate.mon}/${objDate.day}`);
+    arrDate.push(arrWeek[idxDate].toUpperCase());
     arrTotal.push(data.total);
     arrArea.push(data.area);
   }
