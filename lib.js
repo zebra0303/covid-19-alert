@@ -114,7 +114,7 @@ exports.addComma = num => {
     num = parseInt(num, 10);
   }
 
-  return num.toLocaleString('en-US')
+  return num.toLocaleString('en-US');
 };
 
 // 슬랙 메시지 제작
