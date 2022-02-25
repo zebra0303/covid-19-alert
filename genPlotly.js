@@ -67,7 +67,7 @@ exports.genPlotly = (date) => {
           console.log(`* imgBB 이미지 URL : ${objData.url}`);
           resolve(objData.url);
         } else {
-          const errTitle = 'File upload Error!!!'
+          const errTitle = 'File upload Error!!!';
           console.debug(`[${errTitle}] -------------------------------`);
           console.error(err);
           console.error(JSON.parse(body));
