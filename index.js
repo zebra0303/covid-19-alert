@@ -8,8 +8,8 @@ const xml = require('xml-parse');
 const { getAPIURL, extractData, genSlackMsg, getDate, getWeekIdx,
   parseCliFlagValue, showError, readDateLog, writeWeeklyData,
   writeDateLog, getGoogleNews } = require('./lib');
-const { genPlotly } = require('./genPlotly');
-//const { genChartImg } = require('./genChartImg');
+//const { genPlotly } = require('./genPlotly');
+const { genChartImg } = require('./genChartImg');
 
 // 입력 오류 체킹
 const environment = parseCliFlagValue('env');
@@ -128,8 +128,8 @@ const callAPI = areaCode => {
       console.log(dataArea, dataTotal);
       // weeklyData 저장  후 그래프 이미지 생성
       writeWeeklyData({ area: dataArea, total: dataTotal});
-      const chartImgURL = await genPlotly(date);
-      //const chartImgURL = await genChartImg(date);
+      //const chartImgURL = await genPlotly(date);
+      const chartImgURL = await genChartImg(date);
 
       callWebhook({ area: dataArea, total: dataTotal, date, img: {url: chartImgURL} });
     }

@@ -45,6 +45,7 @@ exports.genPlotly = (date) => {
         console.log(`* Plotly Error Message : ${err.body.message}`);
         reject(new Error('Grapch Generation Error!!!'));
       }
+
       const img_url = `${msg.url}.png?_t=${(new Date()).valueOf()}`;
       console.log(`* Polyglot 이미지 URL : ${img_url}`);
 
@@ -66,7 +67,11 @@ exports.genPlotly = (date) => {
           console.log(`* imgBB 이미지 URL : ${objData.url}`);
           resolve(objData.url);
         } else {
-          reject(new Error('File upload Error!!!'));
+          const errTitle = 'File upload Error!!!'
+          console.debug(`[${errTitle}] -------------------------------`);
+          console.error(err);
+          console.error(JSON.parse(body));
+          reject(new Error(errTitle));
         }
       });
     });
