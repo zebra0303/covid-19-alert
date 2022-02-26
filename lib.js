@@ -1,20 +1,24 @@
 // 날짜 정보 가져오기 YYYYMMDD
 exports.getDate = minDay => {
   const date = new Date();
-  if(minDay > 0) {
+  if (minDay > 0) {
     date.setDate(date.getDate() - minDay);
   }
   const yyyy = String(date.getFullYear());
   const mm = String(1 + date.getMonth()).padStart(2, '0')
   const dd = String(date.getDate()).padStart(2, '0');
 
-  return { 'year': yyyy, 'mon': mm, 'day': dd};
+  return {
+    'year': yyyy,
+    'mon': mm,
+    'day': dd
+  };
 };
 
 // 요일 인덱스값 가져오기 Sunday - Saturday : 0 - 6
 exports.getWeekIdx = minDay => {
   const date = new Date();
-  if(minDay > 0) {
+  if (minDay > 0) {
     date.setDate(date.getDate() - minDay);
   }
 
@@ -26,8 +30,7 @@ exports.readDateLog = logFile => {
   const fs = require('fs');
   if (fs.existsSync(logFile)) {
     return fs.readFileSync(logFile, 'utf8');
-  }
-  else {
+  } else {
     return '12251225';
   }
 }
@@ -46,8 +49,30 @@ exports.writeDateLog = (logFile, date) => {
   });
 };
 
+// URL 다운로드
+exports.downloadURL = (url, filepath) => {
+  const fs = require('fs');
+  const client = require('https');
+
+  return new Promise((resolve, reject) => {
+    client.get(url, (res) => {
+      if (res.statusCode === 200) {
+        res.pipe(fs.createWriteStream(filepath))
+          .on('error', reject)
+          .once('close', () => resolve(filepath));
+      } else {
+        res.resume();
+        reject(new Error(`Request Failed With a Status Code: ${res.statusCode}`));
+      }
+    });
+  });
+};
+
 // weekly데이타 저장
-exports.writeWeeklyData = ({ area, total }) => {
+exports.writeWeeklyData = ({
+  area,
+  total
+}) => {
   const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const fs = require('fs');
   const path = `./weeklyData/${arrWeek[this.getWeekIdx(0)]}.js`;
@@ -76,9 +101,8 @@ exports.getAPIURL = (opt, date) => {
     url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson';
     url += `?ServiceKey=${process.env.DATA_API_KEY}&ServiceKey=-&pageNo=1`;
     url += `&numOfRows=10&startCreateDt=${chkDate}&endCreateDt=${chkDate}`;
-  }
-  else if (opt === 'slack') {
-    url =  `https://hooks.slack.com/services/${process.env.SLACK_WEBHOOK_KEY}`;
+  } else if (opt === 'slack') {
+    url = `https://hooks.slack.com/services/${process.env.SLACK_WEBHOOK_KEY}`;
   }
 
   return url;
@@ -103,7 +127,7 @@ exports.parseCliFlagValue = flagName => {
     .find(argument => argument.indexOf(`--${flagName}=`) > -1);
 
   if (flag) {
-      return flag.slice(flag.indexOf('=') + 1);
+    return flag.slice(flag.indexOf('=') + 1);
   }
 
   return undefined;
@@ -118,7 +142,13 @@ exports.addComma = num => {
 };
 
 // 슬랙 메시지 제작
-exports.genSlackMsg = ({ area, total, date, img, news }) => {
+exports.genSlackMsg = ({
+  area,
+  total,
+  date,
+  img,
+  news
+}) => {
   const objCnt = {
     total: parseInt(total.localOccCnt, 10) + parseInt(total.overFlowCnt, 10),
     area: parseInt(area.localOccCnt, 10) + parseInt(area.overFlowCnt, 10)
@@ -127,13 +157,13 @@ exports.genSlackMsg = ({ area, total, date, img, news }) => {
   msg += `(${date.mon}월 ${date.day}일 00시 기준)`;
   console.log(`* Slack Message: ${msg}`);
   let newsList = '';
-  for(item of news) {
+  for (item of news) {
     newsList += `• <${item.link}|${item.title}>`;
     newsList += '\n';
   }
 
   const unixTime = (new Date()).valueOf();
-  const rateDeath = ((total.deathCnt*100)/total.defCnt).toFixed(2);
+  const rateDeath = ((total.deathCnt * 100) / total.defCnt).toFixed(2);
   return `{
     "blocks": [
       {
@@ -220,18 +250,21 @@ exports.getGoogleNews = async (cntItem = 3) => {
   for (let i = 0; i < cntItem; i++) {
     const item = feed.items[i];
     let title = item.title.replace(/\"/g, '\\"').replace(/ - [^-]+$/, '')
-      .replace(/\s[<\-\|:]\s.+$/, '')  // ' - 한국어 방송' 같은 문구 제거
+      .replace(/\s[<\-\|:]\s.+$/, '') // ' - 한국어 방송' 같은 문구 제거
       .trim();
-      //.replace(/<\/?b>/ig, '')
-      //.replace(/&#39;/g, '\'')
-      //.replace('...', '');
-    if(title.length > lenTitle) {
+    //.replace(/<\/?b>/ig, '')
+    //.replace(/&#39;/g, '\'')
+    //.replace('...', '');
+    if (title.length > lenTitle) {
       title = title.substring(0, lenTitle).trim().replace(/(?:…|\.+)$/, '').trim() + '…';
     }
     const link = item.link;
     //decodeURIComponent(item.link.replace(/^http.+url=/, '').replace(/&ct=.+$/, ''));
 
-    arrNews.push({title, link});
+    arrNews.push({
+      title,
+      link
+    });
   }
   console.debug(arrNews);
   return arrNews;

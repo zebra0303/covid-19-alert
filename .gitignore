@@ -12,6 +12,9 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # 날짜 정보
 weeklyData/*.js
 
+# 임시 저장 이미지 
+covid-19-graph.png
+
 # Runtime data
 pids
 *.pid

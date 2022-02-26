@@ -46,33 +46,43 @@ exports.genPlotly = (date) => {
         reject(new Error('Grapch Generation Error!!!'));
       }
 
-      const img_url = `${msg.url}.png?_t=${(new Date()).valueOf()}`;
-      console.log(`* Polyglot 이미지 URL : ${img_url}`);
+      const imgURL = `${msg.url}.png?_t=${(new Date()).valueOf()}`;
+      console.log(`* Polyglot 이미지 URL : ${imgURL}`);
+      const imgPath = 'covid-19-graph.png';
 
-      // upload to imgBB
-      const options = {
-        uri:'https://api.imgbb.com/1/upload',
-        method: 'POST',
-        form: {
-          key: `${process.env.IMG_BB_API_KEY}`,
-          image: img_url,
-          name: `covid-19-${date.year}-${date.mon}-${date.day}.png`
-        }
-      };
+      const { downloadURL } = require('./lib');
+      downloadURL(imgURL, imgPath)
+      .then((imgPath) => {
+        // upload to imgBB
+        const fs = require('fs');
+        const readFile = fs.readFileSync(imgPath); //이미지 파일 읽기
+        const imgBinData = Buffer.from(readFile).toString('base64'); //파일 인코딩
+        const options = {
+          uri:'https://api.imgbb.com/1/upload',
+          method: 'POST',
+          form: {
+            key: `${process.env.IMG_BB_API_KEY}`,
+            image: imgBinData,
+            name: `covid-19-${date.year}-${date.mon}-${date.day}.png`
+          }
+        };
 
-      const request = require('request');
-      request.post(options, function(err, httpResponse, body){
-        if (httpResponse.statusCode === 200) {
-          const objData = JSON.parse(body).data;
-          console.log(`* imgBB 이미지 URL : ${objData.url}`);
-          resolve(objData.url);
-        } else {
-          const errTitle = 'File upload Error!!!';
-          console.debug(`[${errTitle}] -------------------------------`);
-          console.error(err);
-          console.error(JSON.parse(body));
-          reject(new Error(errTitle));
-        }
+        const request = require('request');
+        request.post(options, function(err, httpResponse, body){
+          if (httpResponse.statusCode === 200) {
+            const objData = JSON.parse(body).data;
+            console.log(`* imgBB 이미지 URL : ${objData.url}`);
+            resolve(objData.url);
+          } else {
+            const errTitle = 'File upload Error!!!';
+            console.debug(`[${errTitle}] -------------------------------`);
+            console.error(err);
+            console.error(JSON.parse(body));
+            reject(new Error(errTitle));
+          }
+        });
+      }).catch(err => {
+        console.error(err);
       });
     });
   });
