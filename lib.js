@@ -188,7 +188,7 @@ exports.genSlackMsg = ({
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": ":br: 누적 사망자 ${this.addComma(total.deathCnt)}명 (추가 ${this.addComma(total.plusDeathCnt)}명, *\`치명율 : ${rateDeath}%\`*) <https://coronaboard.kr/|실시간 상황판>"
+          "text": ":br: 누적 사망자 ${this.addComma(total.deathCnt)}명 (추가 ${this.addComma(total.plusDeathCnt)}명, *\`치명율: ${rateDeath}%\`*) <https://coronaboard.kr/|실시간 상황판>"
         }
       },
       {
