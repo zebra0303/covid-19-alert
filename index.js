@@ -114,6 +114,16 @@ const callAPI = areaCode => {
         }
       }
 
+      // 치명률 계산 : 사망자 수 / 감염자 수
+      dataTotal.rateDeath = ((dataTotal.deathCnt * 100) / dataTotal.defCnt).toFixed(2);
+      if (parseInt(dataTotal.rateDeath, 10) >= 100) {
+        console.debug(dataTotal);
+        console.error(`치명률이 ${dataTotal.rateDeath}%로 나옵니다. API 오류를 체킹해 보세요.`)
+        console.error('치명률 계산식 : (dataTotal.deathCnt * 100) / dataTotal.defCnt).toFixed(2)');
+        return false;
+      }
+
+
       // 추가 사망자 계산
       const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
       const yesterdayWeekIdx = getWeekIdx(1);
