@@ -127,6 +127,7 @@ const callAPI = areaCode => {
       // 추가 사망자 계산
       const arrWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
       const yesterdayWeekIdx = getWeekIdx(1);
+      const todayWeekIdx = getWeekIdx(0);
       const fileWeeklyData = `./weeklyData/${arrWeek[yesterdayWeekIdx]}`;
       const { 'data' : yesterdayData} = require(fileWeeklyData);
       if (typeof yesterdayData.death === 'undefined') {
@@ -141,7 +142,13 @@ const callAPI = areaCode => {
       const chartImgURL = await genPlotly(date);
       //const chartImgURL = await genChartImg(date);
 
-      callWebhook({ area: dataArea, total: dataTotal, date, img: {url: chartImgURL} });
+      // 주말에는 슬랙 알람 중지
+      if (arrWeek[todayWeekIdx] !== 'sat' && arrWeek[todayWeekIdx] !== 'sun') {
+        callWebhook({ area: dataArea, total: dataTotal, date, img: {url: chartImgURL} });
+      } else {
+        console.log(`* Week value: ${arrWeek[todayWeekIdx]}, 슬랙알람을 스킵합니다.`);
+        writeDateLog(logFile, date);
+      }
     }
     else {
       showError(response, options);
